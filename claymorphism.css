@@ -1,0 +1,1644 @@
+/*!
+ * Claymorphism UI Kit for Oracle APEX Universal Theme 1.0.0 (built and tested with APEX 26.2, theme style Iris)
+ * TechRevX, MIT License - https://github.com/aamirkhanz/apex-claymorphism-ui-kit
+ *
+ * Claymorphism: puffy, inflated surfaces like soft clay, with a light from the top left inside each shape, a deep
+ * soft shadow under it, generous round corners, a pastel page and a candy violet-to-pink accent.
+ * Works with every Universal Theme component; light and dark mode.
+ *
+ * Use it in any application:
+ *   1. Upload claymorphism.css (and claymorphism.js for the light/dark switch) as Static Application Files.
+ *   2. Shared Components > User Interface Attributes > CSS > File URLs:          #APP_FILES#claymorphism.css
+ *                                                       JavaScript > File URLs:  #APP_FILES#claymorphism.js
+ *   3. Optional: dark mode. claymorphism.js switches it (window.claymorphism.toggle(), buttons with
+ *      data-cl-mode-toggle); see its header for the one-line snippet that avoids a flash on page load.
+ *      Without the JavaScript, add class "cl-dark" to <html> yourself for dark.
+ *
+ * Customize: override the --cl-* tokens below in your own CSS, for example
+ *   :root { --cl-accent: #10b981; --cl-accent-2: #06b6d4; --cl-accent-text: #047857; --cl-radius: 28px; }
+ * Helper classes for your own regions and items: cl-clay, cl-clay-sm, cl-inset, cl-flat, cl-pill, cl-accent.
+ * Accessibility: text colors meet WCAG AA on the surfaces; keyboard focus always shows a ring; motion is reduced
+ * when the user asks for it.
+ */
+
+/* =====================================================================================================================
+   1. Tokens
+   ===================================================================================================================== */
+:root,
+html.cl-light {
+  color-scheme: light;
+  --cl-font: "Nunito", "Quicksand", "Varela Round", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cl-page: #eef0fb;                       /* a soft periwinkle page */
+  --cl-page-fill: linear-gradient(160deg, #eef0fb 0%, #f5eefa 100%);
+  --cl-bg: #fdfdff;                         /* clay panels: regions, cards, buttons */
+  --cl-surface-2: #ffffff;                  /* popups, menus, dialogs */
+  --cl-well: #f1f2fc;                       /* pressed-in fields */
+  --cl-track: #e6e8f8;                      /* tab bars, segmented controls */
+  --cl-text: #2d2a4a;
+  --cl-text-2: #5b587a;
+  --cl-text-3: #7f7c9c;
+  --cl-line: rgba(45, 42, 74, .08);
+  --cl-hover: rgba(45, 42, 74, .04);
+  --cl-field-edge: transparent;
+  --cl-tint: 92, 84, 170;                   /* the color of clay shadows (r, g, b) */
+
+  --cl-accent: #8b5cf6;
+  --cl-accent-2: #ec4899;                   /* end of the candy gradient */
+  --cl-accent-hover: #7c4ef0;
+  --cl-on-accent: #fff;
+  --cl-accent-text: #6b3fd8;
+  --cl-accent-tint: rgba(139, 92, 246, .14);
+  --cl-accent-fill: linear-gradient(135deg, #9d6bff 0%, var(--cl-accent-2) 100%);
+
+  --cl-success: #15803d;  --cl-success-tint: rgba(21, 128, 61, .12);
+  --cl-warning: #a16207;  --cl-warning-tint: rgba(202, 138, 4, .14);
+  --cl-danger: #d6264f;   --cl-danger-tint: rgba(214, 38, 79, .1);
+  --cl-info: #2563eb;     --cl-info-tint: rgba(37, 99, 235, .1);
+
+  /* clay: a light inside the top left, a shade inside the bottom right, and a soft deep shadow under the shape */
+  --cl-raised: 10px 14px 28px -8px rgba(var(--cl-tint), .24), inset -6px -8px 14px rgba(var(--cl-tint), .09), inset 6px 6px 12px rgba(255, 255, 255, .95);
+  --cl-raised-sm: 5px 7px 14px -4px rgba(var(--cl-tint), .28), inset -3px -4px 8px rgba(var(--cl-tint), .11), inset 3px 3px 6px rgba(255, 255, 255, .95);
+  /* inside clipped bars (tabs, segmented controls): small enough to fit in their padding */
+  --cl-raised-xs: 2px 3px 6px -1px rgba(var(--cl-tint), .25), inset -2px -2px 4px rgba(var(--cl-tint), .1), inset 2px 2px 4px rgba(255, 255, 255, .95);
+  --cl-raised-lg: 14px 20px 36px -10px rgba(var(--cl-tint), .3), inset -6px -8px 14px rgba(var(--cl-tint), .09), inset 6px 6px 12px rgba(255, 255, 255, .95);
+  --cl-inset: inset 4px 5px 10px rgba(var(--cl-tint), .16), inset -4px -4px 8px rgba(255, 255, 255, .9);
+  --cl-inset-sm: inset 2px 3px 6px rgba(var(--cl-tint), .22), inset -2px -2px 4px rgba(255, 255, 255, .85);
+  --cl-float: 0 24px 48px -16px rgba(var(--cl-tint), .38), inset -4px -6px 12px rgba(var(--cl-tint), .07), inset 4px 4px 10px rgba(255, 255, 255, .95);
+  --cl-accent-shadow: 6px 8px 16px -5px rgba(139, 92, 246, .5), inset -3px -4px 8px rgba(80, 20, 120, .22), inset 3px 3px 6px rgba(255, 255, 255, .4);
+  --cl-focus: 0 0 0 3px rgba(139, 92, 246, .35);
+
+  --cl-radius: 24px;
+  --cl-radius-sm: 14px;
+  --cl-radius-xs: 10px;
+  --cl-radius-lg: 32px;
+  --cl-radius-pill: 999px;
+  --cl-speed: .2s;
+}
+
+html.cl-dark {
+  color-scheme: dark;
+  --cl-page: #1c1a2e;
+  --cl-page-fill: linear-gradient(160deg, #1c1a2e 0%, #231a30 100%);
+  --cl-bg: #2a2742;
+  --cl-surface-2: #312e4c;
+  --cl-well: #221f37;
+  --cl-track: #211e35;
+  --cl-text: #eeedff;
+  --cl-text-2: #bab7d9;
+  --cl-text-3: #918eb2;
+  --cl-line: rgba(255, 255, 255, .08);
+  --cl-hover: rgba(255, 255, 255, .05);
+
+  --cl-accent: #a78bfa;
+  --cl-accent-2: #f472b6;
+  --cl-accent-hover: #b69cfb;
+  --cl-on-accent: #fff;
+  --cl-accent-text: #c9b8fd;
+  --cl-accent-tint: rgba(167, 139, 250, .18);
+  --cl-accent-fill: linear-gradient(135deg, #8b5cf6 0%, #db2777 100%);
+
+  --cl-success: #4ade80;  --cl-success-tint: rgba(74, 222, 128, .14);
+  --cl-warning: #fbbf24;  --cl-warning-tint: rgba(251, 191, 36, .14);
+  --cl-danger: #fb7185;   --cl-danger-tint: rgba(251, 113, 133, .14);
+  --cl-info: #60a5fa;     --cl-info-tint: rgba(96, 165, 250, .14);
+
+  --cl-raised: 10px 14px 28px -8px rgba(0, 0, 0, .6), inset -6px -8px 14px rgba(0, 0, 0, .3), inset 6px 6px 12px rgba(255, 255, 255, .07);
+  --cl-raised-sm: 5px 7px 14px -4px rgba(0, 0, 0, .6), inset -3px -4px 8px rgba(0, 0, 0, .32), inset 3px 3px 6px rgba(255, 255, 255, .08);
+  --cl-raised-xs: 2px 3px 6px -1px rgba(0, 0, 0, .55), inset -2px -2px 4px rgba(0, 0, 0, .3), inset 2px 2px 4px rgba(255, 255, 255, .08);
+  --cl-raised-lg: 14px 20px 36px -10px rgba(0, 0, 0, .7), inset -6px -8px 14px rgba(0, 0, 0, .3), inset 6px 6px 12px rgba(255, 255, 255, .07);
+  --cl-inset: inset 4px 5px 10px rgba(0, 0, 0, .45), inset -3px -3px 8px rgba(255, 255, 255, .05);
+  --cl-inset-sm: inset 2px 3px 6px rgba(0, 0, 0, .45), inset -2px -2px 4px rgba(255, 255, 255, .04);
+  --cl-float: 0 24px 48px -16px rgba(0, 0, 0, .75), inset -4px -6px 12px rgba(0, 0, 0, .25), inset 4px 4px 10px rgba(255, 255, 255, .06);
+  --cl-accent-shadow: 6px 8px 16px -5px rgba(0, 0, 0, .6), inset -3px -4px 8px rgba(40, 0, 60, .35), inset 3px 3px 6px rgba(255, 255, 255, .3);
+  --cl-focus: 0 0 0 3px rgba(167, 139, 250, .45);
+}
+
+/* =====================================================================================================================
+   2. Universal Theme and APEX widget variables point at the tokens
+   ===================================================================================================================== */
+:root {
+  --ut-color-scheme: light;
+  /* palette */
+  --ut-palette-primary: var(--cl-accent);
+  --ut-palette-primary-contrast: var(--cl-on-accent);
+  --ut-palette-primary-shade: var(--cl-accent-tint);
+  --ut-palette-primary-text: var(--cl-accent-text);
+  --ut-palette-primary-alt: var(--cl-accent);
+  --ut-palette-primary-alt-contrast: var(--cl-on-accent);
+  --ut-palette-primary-alt-shade: var(--cl-accent-tint);
+  --ut-palette-primary-alt-text: var(--cl-accent-text);
+  --ut-palette-success: var(--cl-success);
+  --ut-palette-success-contrast: #fff;
+  --ut-palette-success-shade: var(--cl-success-tint);
+  --ut-palette-success-text: var(--cl-success);
+  --ut-palette-warning: var(--cl-warning);
+  --ut-palette-warning-contrast: #fff;
+  --ut-palette-warning-shade: var(--cl-warning-tint);
+  --ut-palette-warning-text: var(--cl-warning);
+  --ut-palette-danger: var(--cl-danger);
+  --ut-palette-danger-contrast: #fff;
+  --ut-palette-danger-shade: var(--cl-danger-tint);
+  --ut-palette-danger-text: var(--cl-danger);
+  --ut-palette-info: var(--cl-info);
+  --ut-palette-info-contrast: #fff;
+  --ut-palette-info-shade: var(--cl-info-tint);
+  --ut-palette-info-text: var(--cl-info);
+  --ut-palette-generic: var(--cl-bg);
+  --ut-palette-generic-contrast: var(--cl-text);
+  --ut-palette-generic-shade: var(--cl-hover);
+  --ut-palette-generic-text: var(--cl-text);
+  --a-palette-primary: var(--cl-accent);
+  --a-palette-primary-contrast: var(--cl-on-accent);
+  --a-palette-primary-shade: var(--cl-accent-tint);
+  --a-palette-success: var(--cl-success);
+  --a-palette-danger: var(--cl-danger);
+  --a-palette-danger-shade: var(--cl-danger-tint);
+  --a-palette-info: var(--cl-info);
+  --a-palette-info-shade: var(--cl-info-tint);
+  --ut-link-text-color: var(--cl-accent-text);
+  --ut-focus-outline-color: var(--cl-accent);
+
+  /* page shell */
+  --ut-body-background-color: var(--cl-page);
+  --ut-body-text-color: var(--cl-text);
+  --ut-body-title-background-color: var(--cl-page);
+  --ut-body-title-text-color: var(--cl-text);
+  --ut-body-title-border-color: transparent;
+  --ut-body-title-backdrop-filter: none;
+  --ut-body-sidebar-background-color: var(--cl-page);
+  --ut-body-sidebar-text-color: var(--cl-text);
+  --ut-body-actions-background-color: var(--cl-page);
+  --ut-body-actions-text-color: var(--cl-text-2);
+  --ut-body-actionstoggle-background-color: var(--cl-bg);
+  --ut-body-actionstoggle-hover-background-color: var(--cl-surface-2);
+  --ut-breadcrumb-item-text-color: var(--cl-text-2);
+  --ut-breadcrumb-item-active-text-color: var(--cl-text);
+  --ut-header-background-color: var(--cl-bg);
+  --ut-header-text-color: var(--cl-text);
+  --ut-header-border-color: transparent;
+  --ut-header-box-shadow: none;
+  --ut-header-menubar-background-color: var(--cl-bg);
+  --ut-header-menubar-item-text-color: var(--cl-text);
+  --ut-header-menubar-item-border-color: transparent;
+  --ut-header-menubar-item-hover-background-color: var(--cl-hover);
+  --ut-header-menubar-item-hover-text-color: var(--cl-text);
+  --ut-header-menubar-item-current-background-color: var(--cl-accent-tint);
+  --ut-header-menubar-item-current-text-color: var(--cl-accent-text);
+  --ut-body-nav-background-color: var(--cl-bg);
+  --ut-body-nav-border-color: transparent;
+  --ut-body-nav-text-color: var(--cl-text);
+  --ut-body-nav-scrollbar-thumb-background-color: var(--cl-line);
+  --ut-body-nav-scrollbar-track-background-color: var(--cl-bg);
+  --ut-navtabs-background-color: var(--cl-bg);
+  --ut-navtabs-text-color: var(--cl-text);
+  --ut-navtabs-item-border-color: transparent;
+  --ut-navtabs-item-hover-background-color: var(--cl-hover);
+  --ut-navtabs-item-active-background-color: var(--cl-bg);
+  --ut-navtabs-item-active-highlight-color: var(--cl-accent);
+  --ut-footer-background-color: transparent;
+  --ut-footer-border-color: transparent;
+  --ut-login-page-background-color: var(--cl-page);
+  --ut-login-region-background-color: var(--cl-bg);
+  --ut-login-region-box-shadow: var(--cl-raised-lg);
+
+  /* components */
+  --ut-component-background-color: var(--cl-bg);
+  --ut-component-border-color: transparent;
+  --ut-component-border-width: 0px;
+  --ut-component-border-radius: var(--cl-radius);
+  --ut-component-box-shadow: var(--cl-raised);
+  --ut-component-inner-border-color: var(--cl-line);
+  --ut-component-highlight-background-color: var(--cl-hover);
+  --ut-component-toolbar-background-color: var(--cl-bg);
+  --ut-component-text-default-color: var(--cl-text);
+  --ut-component-text-title-color: var(--cl-text);
+  --ut-component-text-subtitle-color: var(--cl-text-2);
+  --ut-component-text-muted-color: var(--cl-text-2);
+  --ut-component-badge-background-color: var(--cl-bg);
+  --ut-component-badge-text-color: var(--cl-text);
+  --ut-component-badge-border-radius: var(--cl-radius-pill);
+  --ut-component-icon-background-color: var(--cl-bg);
+  --ut-component-icon-color: var(--cl-accent-text);
+  --ut-badge-border-radius: var(--cl-radius-pill);
+  --ut-region-background-color: var(--cl-bg);
+  --ut-region-text-color: var(--cl-text);
+  --ut-region-header-background-color: transparent;
+  --ut-region-header-text-color: var(--cl-text);
+  --ut-region-header-border-color: transparent;
+  --ut-region-border-width: 0px;
+  --ut-region-box-shadow: var(--cl-raised);
+  --ut-button-region-box-shadow: var(--cl-raised);
+  --ut-cardlist-box-shadow: var(--cl-raised);
+  --ut-alert-box-shadow: var(--cl-raised);
+  --ut-resultsregion-background-color: var(--cl-bg);
+  --ut-resultsregion-border-color: transparent;
+  --ut-resultsregion-search-background-color: var(--cl-bg);
+  --ut-resultsregion-search-border-color: transparent;
+  --ut-wizard-header-background-color: var(--cl-bg);
+  --ut-report-header-background-color: var(--cl-hover);
+  --ut-report-cell-border-color: var(--cl-line);
+  --ut-report-cell-hover-background-color: var(--cl-hover);
+  --ut-report-cell-alt-background-color: var(--cl-hover);
+  --ut-hero-region-title-text-color: var(--cl-text);
+  --ut-linkslist-arrow-color: var(--cl-text-3);
+  --ut-comment-chat-background-color: var(--cl-bg);
+  --ut-comment-chat-active-background-color: var(--cl-accent-tint);
+  --ut-field-label-text-color: var(--cl-text);
+  --ut-field-input-focus-icon-color: var(--cl-accent);
+  --ut-field-fl-input-focus-icon-color: var(--cl-accent);
+  --ut-field-fl-input-focus-icon-background-color: transparent;
+  --ut-tabs-item-text-color: var(--cl-text-2);
+  --ut-tabs-item-active-text-color: var(--cl-text);
+  --ut-tabs-item-hint-highlight-color: var(--cl-accent);
+  --ut-treeview-badge-background-color: var(--cl-accent);
+  --ut-treeview-badge-text-color: var(--cl-on-accent);
+  --ut-wp-marker-color: var(--cl-accent);
+  --ut-wp-track-color: var(--cl-line);
+  --ut-navbar-button-badge-background-color: var(--cl-accent);
+
+  /* shapes and depth */
+  --ut-border-radius: var(--cl-radius-sm);
+  --ut-border-radius-sm: var(--cl-radius-xs);
+  --ut-border-radius-md: var(--cl-radius-sm);
+  --ut-border-radius-lg: var(--cl-radius);
+  --ut-shadow-sm: var(--cl-raised-sm);
+  --ut-shadow-md: var(--cl-raised);
+  --ut-shadow-lg: var(--cl-raised-lg);
+
+  /* APEX widgets: buttons */
+  --a-button-background-color: var(--cl-bg);
+  --a-button-text-color: var(--cl-text);
+  --a-button-border-color: transparent;
+  --a-button-border-width: 0px;
+  --a-button-border-radius: var(--cl-radius-sm);
+  --a-button-shadow: var(--cl-raised-sm);
+  --a-button-box-shadow: var(--cl-raised-sm);
+  --a-button-hover-background-color: var(--cl-bg);
+  --a-button-hover-text-color: var(--cl-accent-text);
+  --a-button-hover-border-color: transparent;
+  --a-button-hover-shadow: var(--cl-raised);
+  --a-button-focus-background-color: var(--cl-bg);
+  --a-button-focus-border-color: transparent;
+  --a-button-active-background-color: var(--cl-bg);
+  --a-button-active-border-color: transparent;
+  --a-button-active-text-color: var(--cl-accent-text);
+  --a-button-active-shadow: var(--cl-inset-sm);
+  --a-button-state-shadow: var(--cl-inset-sm);
+  --a-button-count-background-color: var(--cl-accent);
+  --a-button-count-text-color: var(--cl-on-accent);
+  /* fields: a little more room than the compact default, so the pressed-in well reads as a field */
+  --a-field-input-padding-y: .5rem;
+  --a-field-input-padding-x: .75rem;   /* text clear of the rounded edge */
+  --ut-field-input-icon-padding-x: .75rem;   /* item icons too */
+  --a-combo-box-padding-x: .5rem;
+  --a-field-input-background-color: var(--cl-well);
+  --a-field-input-hover-background-color: var(--cl-well);
+  --a-field-input-focus-background-color: var(--cl-well);
+  --a-field-input-text-color: var(--cl-text);
+  --a-field-input-border-color: var(--cl-field-edge);
+  --a-field-input-focus-border-color: var(--cl-accent);
+  --a-field-input-border-radius: var(--cl-radius-sm);
+  --a-field-input-state-background-color: var(--cl-well);
+  --a-field-input-state-border-color: var(--cl-field-edge);   /* fields drawn by APEX web components and item groups */
+  --a-field-input-state-text-color: var(--cl-text-2);
+  --a-form-error-text-color: var(--cl-danger);
+  --a-form-required-asterisk-text-color: var(--cl-danger);
+  --a-checkbox-background-color: var(--cl-bg);
+  --a-checkbox-hover-background-color: var(--cl-bg);
+  --a-checkbox-active-background-color: var(--cl-bg);
+  --a-checkbox-border-color: transparent;
+  --a-checkbox-border-radius: var(--cl-radius-xs);
+  --a-checkbox-checked-background-color: var(--cl-accent);
+  --a-checkbox-checked-text-color: var(--cl-on-accent);
+  --a-checkbox-shadow: var(--cl-inset-sm);
+  --a-switch-background-color: var(--cl-bg);
+  --a-switch-hover-background-color: var(--cl-bg);
+  --a-switch-active-background-color: var(--cl-bg);
+  --a-switch-border-color: transparent;
+  --a-switch-border-radius: var(--cl-radius-pill);
+  --a-switch-shadow: var(--cl-inset-sm);
+  --a-switch-checked-background-color: var(--cl-accent);
+  --a-switch-checked-hover-background-color: var(--cl-accent-hover);
+  --a-switch-checked-active-background-color: var(--cl-accent-hover);
+  --a-switch-toggle-background-color: var(--cl-surface-2);
+  --a-switch-toggle-hover-background-color: var(--cl-surface-2);
+  --a-switch-toggle-active-background-color: var(--cl-surface-2);
+  --a-switch-toggle-checked-background-color: #f2f2f2;
+  --a-switch-toggle-checked-hover-background-color: #f2f2f2;
+  --a-switch-toggle-checked-active-background-color: #f2f2f2;
+  --a-switch-toggle-border-color: transparent;
+  --a-switch-toggle-shadow: var(--cl-raised-sm);
+  --a-chip-border-color: transparent;
+  --a-chip-border-radius: var(--cl-radius-pill);
+  --a-chip-hover-background-color: var(--cl-hover);
+  --a-chip-active-background-color: var(--cl-accent-tint);
+  --a-chip-applied-background-color: var(--cl-accent-tint);
+  --a-chip-applied-hover-background-color: var(--cl-accent-tint);
+  --a-popuplov-chip-background-color: var(--cl-bg);
+  --a-popuplov-chip-border-color: transparent;
+  --a-popuplov-dialog-background-color: var(--cl-surface-2);
+  --a-starrating-stars-fg-color: var(--cl-warning);
+  --a-starrating-stars-bg-color: var(--cl-line);
+  --a-filedrop-border-color: color-mix(in srgb, var(--cl-text-3) 55%, transparent);
+  --a-filedrop-border-radius: var(--cl-radius);
+  --a-filedrop-dragging-background-color: var(--cl-accent-tint);
+  --a-filedrop-dragging-border-color: var(--cl-accent);
+  --a-filedrop-focus-border-color: var(--cl-accent);
+  --a-filedrop-heading-text-color: var(--cl-text);
+  --a-filedrop-text-color: var(--cl-text-2);
+  --a-mdeditor-background-color: var(--cl-bg);
+  --a-mdeditor-border-color: transparent;
+  /* menus, tooltips, toolbars */
+  --a-menu-background-color: var(--cl-surface-2);
+  --a-menu-text-color: var(--cl-text);
+  --a-menu-border-color: transparent;
+  --a-menu-border-radius: var(--cl-radius-sm);
+  --a-menu-shadow: var(--cl-float);
+  --a-menu-focused-background-color: var(--cl-accent-tint);
+  --a-menu-focused-text-color: var(--cl-text);
+  --a-menu-expanded-background-color: var(--cl-hover);
+  --a-menu-expanded-text-color: var(--cl-text);
+  --a-menu-sep-border-color: var(--cl-line);
+  --a-menu-accel-text-color: var(--cl-text-3);
+  --a-menu-callout-background-color: var(--cl-surface-2);
+  --a-menu-callout-border-color: transparent;
+  --a-menu-callout-shadow: var(--cl-float);
+  --a-menubar-background-color: var(--cl-bg);
+  --a-menubar-item-background-color: transparent;
+  --a-menubar-item-border-color: transparent;
+  --a-menubar-item-text-color: var(--cl-text);
+  --a-menubar-item-current-background-color: var(--cl-accent-tint);
+  --a-menubar-item-current-text-color: var(--cl-accent-text);
+  --a-menubar-item-split-border-color: var(--cl-line);
+  --a-menubar-item-split-icon-color: var(--cl-text-2);
+  --a-tooltip-background-color: var(--cl-text);
+  --a-tooltip-text-color: var(--cl-bg);
+  --a-toolbar-background-color: transparent;
+  --a-toolbar-border-color: transparent;
+  --a-toolbar-sep-border-color: var(--cl-line);
+  --a-kb-shortcut-background-color: var(--cl-hover);
+  --a-kb-shortcut-border-color: var(--cl-line);
+  --a-overlay-background-color: rgba(30, 36, 48, .35);
+  --a-spinner-color: var(--cl-accent);
+  --a-spinner-container-background-color: var(--cl-surface-2);
+  --a-spinner-container-shadow: var(--cl-float);
+  /* tree view (side navigation, tree region) */
+  --a-treeview-node-text-color: var(--cl-text);
+  --a-treeview-node-icon-color: var(--cl-text-2);
+  --a-treeview-node-hover-background-color: var(--cl-hover);
+  --a-treeview-node-hover-text-color: var(--cl-text);
+  --a-treeview-node-selected-background-color: transparent;
+  --a-treeview-node-selected-background-override-color: transparent;
+  --a-treeview-node-selected-text-color: var(--cl-accent-text);
+  --a-treeview-node-selected-icon-color: var(--cl-accent-text);
+  --a-treeview-node-focused-background-color: var(--cl-hover);
+  --a-treeview-node-focused-text-color: var(--cl-text);
+  --a-treeview-node-focused-shadow: inset 0 0 0 2px var(--cl-accent);
+  --a-treeview-node-active-background-color: var(--cl-accent-tint);
+  --a-treeview-node-active-text-color: var(--cl-text);
+  /* interactive grid, reports, cards, faceted search, search results */
+  --a-gv-background-color: transparent;
+  --a-gv-border-color: transparent;
+  --a-gv-cell-border-color: var(--cl-line);
+  --a-gv-header-background-color: var(--cl-hover);
+  --a-gv-header-cell-border-color: var(--cl-line);
+  --a-gv-row-hover-background-color: var(--cl-hover);
+  --a-gv-footer-background-color: var(--cl-bg);
+  --a-gv-footer-border-color: var(--cl-line);
+  --a-gv-grandtotal-background-color: var(--cl-hover);
+  --a-gv-pagination-button-background-color: var(--cl-bg);
+  --a-gv-pagination-button-border-color: transparent;
+  --a-gv-pagination-button-hover-background-color: var(--cl-bg);
+  --a-gv-pagination-button-text-color: var(--cl-text);
+  --a-gv-inserted-background-color: var(--cl-success-tint);
+  --a-gv-updated-background-color: var(--cl-info-tint);
+  --a-gv-deleted-background-color: var(--cl-danger-tint);
+  --a-report-controls-cell-label-background-color: var(--cl-bg);
+  --a-report-controls-cell-label-text-color: var(--cl-text);
+  --a-report-controls-cell-label-border-color: transparent;
+  --a-report-controls-border-color: transparent;
+  --a-report-controls-input-border-color: transparent;
+  --a-cv-background-color: var(--cl-bg);
+  --a-cv-border-color: transparent;
+  --a-cv-border-width: 0px;
+  --a-cv-border-radius: var(--cl-radius);
+  --a-cv-shadow: var(--cl-raised);
+  --a-cv-hover-background-color: var(--cl-bg);
+  --a-cv-hover-border-color: transparent;
+  --a-cv-hover-shadow: var(--cl-raised-lg);
+  --a-cv-active-background-color: var(--cl-bg);
+  --a-cv-active-border-color: transparent;
+  --a-cv-active-shadow: var(--cl-inset);
+  --a-cv-focus-border-color: var(--cl-accent);
+  --a-cv-header-background-color: transparent;
+  --a-cv-header-border-color: transparent;
+  --a-cv-actions-background-color: transparent;
+  --a-cv-actions-border-color: var(--cl-line);
+  --a-cv-icon-background-color: var(--cl-bg);
+  --a-cv-badge-background-color: var(--cl-accent-tint);
+  --a-fs-chart-background-color: var(--cl-bg);
+  --a-fs-chart-border-color: transparent;
+  --a-fs-chart-border-radius: var(--cl-radius);
+  --a-fs-chart-shadow: var(--cl-raised);
+  --a-fs-control-seperator-border-color: var(--cl-line);
+  --a-fs-search-container-border-color: transparent;
+  --a-fs-toggle-background-color: var(--cl-bg);
+  --a-fs-toggle-border-color: transparent;
+  --a-fs-toggle-text-color: var(--cl-text);
+  --a-resultsitem-background-color: var(--cl-bg);
+  --a-resultsitem-border-color: transparent;
+  --a-resultsitem-border-radius: var(--cl-radius);
+  --a-resultsitem-badge-background-color: var(--cl-accent-tint);
+  --a-resultsitem-misc-text-color: var(--cl-text-2);
+  /* date picker */
+  --a-datepicker-background-color: var(--cl-surface-2);
+  --a-datepicker-border-radius: var(--cl-radius);
+  --a-datepicker-header-background-color: var(--cl-surface-2);
+  --a-datepicker-header-border-color: var(--cl-line);
+  --a-datepicker-footer-background-color: var(--cl-surface-2);
+  --a-datepicker-calendar-background-color: var(--cl-surface-2);
+  --a-datepicker-calendar-title-background-color: var(--cl-surface-2);
+  --a-datepicker-calendar-header-background-color: var(--cl-surface-2);
+  --a-datepicker-calendar-header-text-color: var(--cl-text-2);
+  --a-datepicker-calendar-day-hover-background-color: var(--cl-hover);
+  --a-datepicker-calendar-day-selected-background-color: var(--cl-accent);
+  --a-datepicker-calendar-day-selected-border-color: var(--cl-accent);
+  --a-datepicker-calendar-day-selected-text-color: var(--cl-on-accent);
+  --a-datepicker-calendar-day-border-radius: var(--cl-radius-sm);
+  --a-datepicker-monthpicker-select-background-color: var(--cl-bg);
+  --a-datepicker-monthpicker-select-border-color: transparent;
+  --a-datepicker-timepicker-select-background-color: var(--cl-bg);
+  --a-datepicker-timepicker-select-border-color: transparent;
+  /* splitter, percent chart, icon list */
+  --a-splitter-bar-background-color: var(--cl-line);
+  --a-splitter-thumb-background-color: var(--cl-bg);
+  --a-percent-chart-background-color: var(--cl-bg);
+  --a-percent-chart-bar-background-color: var(--cl-accent);
+  --a-percent-chart-border-color: transparent;
+  --a-iconlist-item-hover-background-color: var(--cl-hover);
+  --a-iconlist-item-selected-background-color: var(--cl-accent-tint);
+  --a-iconlist-item-selected-text-color: var(--cl-accent-text);
+
+  /* FullCalendar (Calendar region) */
+  --fc-page-bg-color: var(--cl-bg);
+  --fc-neutral-bg-color: var(--cl-hover);
+  --fc-neutral-text-color: var(--cl-text-2);
+  --fc-border-color: var(--cl-line);
+  --fc-today-bg-color: var(--cl-accent-tint);
+  --fc-event-bg-color: var(--cl-accent);
+  --fc-event-border-color: var(--cl-accent);
+  --fc-event-text-color: var(--cl-on-accent);
+  --fc-list-event-hover-bg-color: var(--cl-hover);
+  --fc-highlight-color: var(--cl-accent-tint);
+  --fc-now-indicator-color: var(--cl-danger);
+}
+html.cl-dark { --ut-color-scheme: dark; --a-overlay-background-color: rgba(0, 0, 0, .55); --a-switch-toggle-checked-background-color: #f2f4f8; }
+
+/* =====================================================================================================================
+   3. Page shell: header, navigation, title bar, footer
+   ===================================================================================================================== */
+body { background: var(--cl-page-fill) fixed, var(--cl-page); color: var(--cl-text); font-family: var(--cl-font); }
+.t-Body, .t-Body-main, .t-Body-content, .t-Body-contentInner, .t-Body-side, .t-Body-actions, .t-Footer { background: transparent; }
+.t-Body-title { background: var(--cl-page); }
+::selection { background: color-mix(in srgb, var(--cl-accent) 28%, transparent); }
+
+.t-Header { background: var(--cl-bg); border-bottom: 0; box-shadow: 0 8px 22px -14px rgba(var(--cl-tint), .45), inset 0 -2px 4px rgba(var(--cl-tint), .05); }
+.t-Header::before { display: none; }              /* Iris draws a brand bar */
+.t-Header-controls .t-Button--headerTree {
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Header-controls .t-Button--headerTree:active { box-shadow: var(--cl-inset-sm); }
+.t-Header-logo-link, .t-Header-logo-link:hover, .t-Header-logo-link:focus { color: var(--cl-text); }
+
+.t-NavigationBar { gap: 10px; }
+.t-Header .t-NavigationBar .t-Button--navBar {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+  transition: box-shadow var(--cl-speed), color var(--cl-speed);
+}
+.t-Header .t-NavigationBar .t-Button--navBar:hover { color: var(--cl-accent-text); background: var(--cl-bg); }
+.t-Header .t-NavigationBar .t-Button--navBar:active,
+.t-Header .t-NavigationBar .t-Button--navBar.is-active { box-shadow: var(--cl-inset-sm); }
+
+/* side navigation: entries are flat; the current one is raised */
+.t-Body-nav { background: var(--cl-bg); border-inline-end: 0; box-shadow: 8px 0 22px -16px rgba(var(--cl-tint), .45); }
+.t-TreeNav { background: transparent; border-inline-end: 0; }
+.t-TreeNav .a-TreeView-node--topLevel { border: 0 !important; }
+.t-TreeNav .a-TreeView-row {
+  margin-inline: 10px;
+  width: auto;
+  border-radius: var(--cl-radius-sm);
+  transition: background-color var(--cl-speed), box-shadow var(--cl-speed);
+}
+.t-TreeNav .a-TreeView-row::before, .t-TreeNav .a-TreeView-row::after { content: none !important; }
+.t-TreeNav .a-TreeView-row.is-hover { background: var(--cl-hover); }
+/* Iris marks the current entry with an inset bar on a more specific selector */
+.t-TreeNav.t-TreeNav .a-TreeView-node--topLevel > .a-TreeView-row.is-current--top,
+.t-TreeNav.t-TreeNav .a-TreeView-node--topLevel > .a-TreeView-row.is-current,
+.t-TreeNav.t-TreeNav .a-TreeView-node--topLevel > .a-TreeView-row.is-selected {
+  background: var(--cl-bg) !important;
+  box-shadow: var(--cl-raised-sm) !important;
+}
+.t-TreeNav .a-TreeView-content { color: var(--cl-text); }
+.t-TreeNav .a-TreeView-content .fa { color: var(--cl-text-2); }
+.t-TreeNav .a-TreeView-content.is-current--top .fa,
+.t-TreeNav .a-TreeView-content.is-current .fa { color: var(--cl-accent); }
+.t-TreeNav .a-TreeView-node:not(.a-TreeView-node--topLevel) .a-TreeView-content.is-current .a-TreeView-label,
+.t-TreeNav .a-TreeView-node:not(.a-TreeView-node--topLevel) .a-TreeView-label.is-current { color: var(--cl-accent-text); font-weight: 700; }
+.t-TreeNav .a-TreeView-node:not(.a-TreeView-node--topLevel) > .a-TreeView-row.is-current,
+.t-TreeNav .a-TreeView-node:not(.a-TreeView-node--topLevel) > .a-TreeView-row.is-selected { background: transparent; box-shadow: none; }
+
+/* top navigation (menu bar and tabs in the header) */
+.t-Header-nav .a-MenuBar-item { border-radius: var(--cl-radius-sm); }
+.t-Header-nav .a-MenuBar-item.is-current { box-shadow: var(--cl-inset-sm); }
+.t-NavTabs-item.is-active { box-shadow: var(--cl-inset-sm); border-radius: var(--cl-radius-sm); }
+
+.t-Body-title { border-bottom: 0; box-shadow: none; }
+.t-Footer { color: var(--cl-text-2); border-top: 0; }
+
+/* =====================================================================================================================
+   4. Regions
+   ===================================================================================================================== */
+.t-Region:not(.t-Region--noUI):not(.t-Region--noBorder):not(.t-Region--removeHeader.t-Region--noBorder) {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised);
+}
+.t-Region-header { border-bottom: 0; background: transparent; border-radius: var(--cl-radius) var(--cl-radius) 0 0; }
+.t-Region-title { color: var(--cl-text); font-weight: 700; }
+.t-Region-buttons .t-Button + .t-Button { margin-inline-start: 8px; }
+/* accent colors (Accent 1-15 set the header's color variable) become a thin colored top edge, not a heavy band */
+.t-Region[class*="t-Region--accent"] { border-top: 0; }
+.t-Region[class*="t-Region--accent"] > .t-Region-header {
+  background: transparent;
+  color: var(--cl-text);
+  box-shadow: inset 0 3px 0 var(--ut-region-header-background-color, var(--cl-accent));
+}
+.t-Region[class*="t-Region--accent"] > .t-Region-header .t-Region-title { color: var(--cl-text); }
+/* scroll body and stacked regions */
+.t-Region--scrollBody > .t-Region-bodyWrap > .t-Region-body { border-radius: 0 0 var(--cl-radius) var(--cl-radius); }
+.t-Region--stacked { box-shadow: none !important; }
+
+/* collapsible */
+.t-Region--hideShow .t-Region-header .t-Button--hideShow {
+  border-radius: 50%;
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Region--hideShow .t-Region-header .t-Button--hideShow:active { box-shadow: var(--cl-inset-sm); }
+.t-Region--hideShow.is-collapsed { box-shadow: var(--cl-raised-sm) !important; }
+
+/* content block */
+.t-ContentBlock-header { border-bottom: 0; }
+.t-ContentBlock-title { color: var(--cl-text); }
+.t-ContentBlock--h1 .t-ContentBlock-body, .t-ContentBlock--h2 .t-ContentBlock-body, .t-ContentBlock--h3 .t-ContentBlock-body { color: var(--cl-text-2); }
+.t-ContentBlock--shadowBG .t-ContentBlock-body,
+.t-ContentBlock--lightBG .t-ContentBlock-body {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-inset);
+}
+
+/* hero */
+.t-HeroRegion { margin-block-end: var(--ut-region-margin, 1rem); border: 0; border-radius: var(--cl-radius-lg); background: var(--cl-bg); box-shadow: var(--cl-raised); }
+/* the icon keeps the shape the template options give it (default, square, circle) */
+.t-HeroRegion-icon {
+  background: var(--cl-accent-fill);
+  color: var(--cl-on-accent);
+  box-shadow: var(--cl-accent-shadow);
+}
+.t-HeroRegion-title { color: var(--cl-text); }
+.t-HeroRegion-description { color: var(--cl-text-2); }
+.t-HeroRegion--featured, .t-HeroRegion--noPadding { box-shadow: var(--cl-raised); }
+
+/* alerts (region template and page messages) */
+.t-Alert {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised);
+}
+.t-Alert .t-Alert-icon .t-Icon { border-radius: 50%; box-shadow: var(--cl-inset-sm); }
+.t-Alert--horizontal .t-Alert-icon { background: transparent; }
+/* Highlight Background: a tint of the type color on the raised surface */
+.t-Alert--colorBG.t-Alert--warning, .t-Alert--colorBG.t-Alert--yellow { background: linear-gradient(var(--cl-warning-tint), var(--cl-warning-tint)), var(--cl-bg); }
+.t-Alert--colorBG.t-Alert--danger, .t-Alert--colorBG.t-Alert--red { background: linear-gradient(var(--cl-danger-tint), var(--cl-danger-tint)), var(--cl-bg); }
+.t-Alert--colorBG.t-Alert--success { background: linear-gradient(var(--cl-success-tint), var(--cl-success-tint)), var(--cl-bg); }
+.t-Alert--colorBG.t-Alert--info { background: linear-gradient(var(--cl-info-tint), var(--cl-info-tint)), var(--cl-bg); }
+.t-Alert--warning .t-Alert-icon .t-Icon, .t-Alert--yellow .t-Alert-icon .t-Icon { color: var(--cl-warning); background: var(--cl-warning-tint); }
+.t-Alert--danger .t-Alert-icon .t-Icon, .t-Alert--red .t-Alert-icon .t-Icon { color: var(--cl-danger); background: var(--cl-danger-tint); }
+.t-Alert--success .t-Alert-icon .t-Icon { color: var(--cl-success); background: var(--cl-success-tint); }
+.t-Alert--info .t-Alert-icon .t-Icon { color: var(--cl-info); background: var(--cl-info-tint); }
+.t-Alert--warning { box-shadow: var(--cl-raised), inset 4px 0 0 var(--cl-warning); }
+.t-Alert--danger { box-shadow: var(--cl-raised), inset 4px 0 0 var(--cl-danger); }
+.t-Alert--success { box-shadow: var(--cl-raised), inset 4px 0 0 var(--cl-success); }
+.t-Alert--info { box-shadow: var(--cl-raised), inset 4px 0 0 var(--cl-info); }
+.t-Alert-title { color: var(--cl-text); }
+.t-Alert-body { color: var(--cl-text-2); }
+.t-Alert--page { border-radius: var(--cl-radius); background: var(--cl-surface-2); box-shadow: var(--cl-float); }
+.t-Alert--page.t-Alert--success { box-shadow: var(--cl-float), inset 4px 0 0 var(--cl-success); }
+.t-Alert--page.t-Alert--warning { box-shadow: var(--cl-float), inset 4px 0 0 var(--cl-danger); }
+.t-Alert--removeHeading .t-Alert-title { display: none; }
+/* the close button of page messages: a small round raised button inside the message */
+.t-Alert--page .t-Alert-wrap { padding-inline-end: 48px; }
+.t-Alert--page .t-Button--closeAlert {
+  top: calc(50% - 14px) !important;
+  right: 12px !important;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50% !important;
+  background: var(--cl-bg) !important;
+  color: var(--cl-text-2) !important;
+  box-shadow: var(--cl-raised-sm) !important;
+  transform: none !important;   /* Universal Theme moves buttons on hover */
+}
+/* floating page messages show the plain icon, without the pressed-in circle */
+.t-Alert--page .t-Alert-icon .t-Icon { background: transparent !important; box-shadow: none; }
+.t-Alert--page .t-Button--closeAlert:hover { color: var(--cl-text) !important; }
+.t-Alert--page .t-Button--closeAlert:active { box-shadow: var(--cl-inset-sm) !important; }
+.t-Alert--page .t-Button--closeAlert .t-Icon { color: inherit; font-size: 12px; }
+
+/* title bar, breadcrumb */
+.t-BreadcrumbRegion { background: transparent; border: 0; box-shadow: none; }
+.t-BreadcrumbRegion-title, .t-BreadcrumbRegion-titleText { color: var(--cl-text); }
+.t-Breadcrumb-label, .t-Breadcrumb-item a { color: var(--cl-text-2); }
+.t-Breadcrumb-item a:hover { color: var(--cl-accent-text); }
+.t-Breadcrumb-item.is-active .t-Breadcrumb-label { color: var(--cl-text); }
+.t-BreadcrumbRegion--useBreadcrumbTitle .t-Breadcrumb { padding: 6px 12px; border-radius: var(--cl-radius-pill); box-shadow: var(--cl-inset-sm); display: inline-flex; }
+
+/* image */
+.t-ImageRegion img, .t-ImageRegion-image { border-radius: var(--cl-radius); box-shadow: var(--cl-raised); }
+
+/* buttons container */
+.t-ButtonRegion { border: 0; border-radius: var(--cl-radius); background: var(--cl-bg); box-shadow: var(--cl-raised); }
+.t-ButtonRegion--noUI, .t-ButtonRegion--noBorder { box-shadow: none; background: transparent; }
+.t-ButtonRegion--slimPadding { box-shadow: var(--cl-raised-sm); }
+
+/* item container */
+.t-ItemContainer { border-radius: var(--cl-radius); }
+
+/* tabs container and tabs list: the tab bar sinks in, the active tab is raised */
+/* tabs container: one raised card, the tab bar pressed in at its top and the tab's content below */
+.t-TabsRegion {
+  margin-block-end: var(--ut-region-margin, 1rem);
+  padding: 10px;
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised);
+}
+.t-TabsRegion .t-TabsRegion-items, .t-TabsRegion > .a-Tabs-panel, .t-TabsRegion-items > .a-Tabs-panel { padding: 14px 8px 6px; }
+.t-TabsRegion .t-TabsRegion-items .t-Region { box-shadow: none; background: transparent; }
+.t-Tabs {
+  gap: 6px;
+  padding: 7px;
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-track);
+  box-shadow: var(--cl-inset);
+}
+.t-Tabs-item { border: 0; }
+.t-Tabs-link { border: 0; border-radius: var(--cl-radius-sm) !important; color: var(--cl-text-2); transition: box-shadow var(--cl-speed), color var(--cl-speed); }
+.t-Tabs-link::before, .t-Tabs-link::after { display: none !important; }
+.t-Tabs-link:hover { color: var(--cl-text); background: transparent; }
+.t-Tabs-item.is-active .t-Tabs-link { background: var(--cl-bg); color: var(--cl-accent-text); box-shadow: var(--cl-raised-xs); font-weight: 700; }
+.t-TabsRegion .a-Tabs-panel, .t-TabsRegion-items > div { border: 0; }
+
+/* carousel: round raised previous/next buttons and pressed-in dots */
+.a-Region-carouselControl .a-Tabs-button {
+  width: 40px;
+  height: 40px;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--cl-bg) !important;
+  color: var(--cl-text) !important;
+  box-shadow: var(--cl-raised-sm) !important;
+  opacity: 1;
+}
+.a-Region-carouselControl .a-Tabs-button:hover { color: var(--cl-accent-text) !important; }
+.a-Region-carouselControl .a-Tabs-button:active { box-shadow: var(--cl-inset-sm) !important; }
+.a-Region-carouselLink { border-radius: 50%; background: var(--cl-bg); box-shadow: var(--cl-inset-sm); }
+.a-Region-carouselNavItem.a-Tabs-selected .a-Region-carouselLink { background: var(--cl-accent); box-shadow: var(--cl-raised-sm); }
+.t-Region--carousel .t-Region-carouselRegions .t-Region { box-shadow: none; background: transparent; }
+/* with previous / next buttons, the slides keep a gutter on each side so the buttons never cover their content */
+.t-Region--showCarouselControls .a-Region-carouselItem { box-sizing: border-box; padding-inline: 64px; }
+.t-Region--showCarouselControls .a-Region-carouselItem .t-Region-header,
+.t-Region--showCarouselControls .a-Region-carouselItem .t-Region-body { padding-inline: 0; }
+
+/* region display selector: the same pressed-in tab bar as Tabs, the selected entry raised */
+.a-RDS-list.a-Tabs, .apex-rds {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-track);
+  box-shadow: var(--cl-inset-sm);
+}
+.a-RDS-item { border: 0; }
+.a-RDS-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--cl-radius-sm);
+  color: var(--cl-text-2);
+}
+.a-RDS-link::before, .a-RDS-link::after, .apex-rds-item a::after { display: none !important; }
+.a-RDS-item.apex-rds-selected .a-RDS-link { background: var(--cl-bg); color: var(--cl-accent-text); box-shadow: var(--cl-raised-xs); font-weight: 700; }
+
+/* wizard */
+.t-Wizard { border: 0; border-radius: var(--cl-radius-lg); background: var(--cl-bg); box-shadow: var(--cl-raised); }
+.t-Wizard-header { border-bottom: 1px solid var(--cl-line); background: transparent; }
+.t-WizardSteps-marker {
+  background: var(--cl-bg);
+  box-shadow: var(--cl-inset-sm);
+}
+.t-WizardSteps-step.is-complete .t-WizardSteps-marker,
+.t-WizardSteps-step.is-active .t-WizardSteps-marker { background: var(--cl-accent); color: var(--cl-on-accent); box-shadow: var(--cl-raised-sm); }
+.t-WizardSteps-step.is-active .t-WizardSteps-label { color: var(--cl-text); font-weight: 700; }
+
+/* inline dialog, popup, drawer and jQuery UI dialogs */
+.ui-dialog, .t-DialogRegion, .t-Drawer {
+  border: 0;
+  border-radius: var(--cl-radius-lg);
+  background: var(--cl-surface-2);
+  color: var(--cl-text);
+  box-shadow: var(--cl-float);
+}
+.ui-dialog .ui-dialog-titlebar { border-bottom: 1px solid var(--cl-line); background: transparent; color: var(--cl-text); border-radius: var(--cl-radius-lg) var(--cl-radius-lg) 0 0; }
+.ui-dialog .ui-dialog-title { color: var(--cl-text); font-weight: 700; }
+.ui-dialog .ui-dialog-content, .t-DialogRegion-body, .t-Dialog-body { background: transparent; color: var(--cl-text); }
+.ui-dialog .ui-dialog-buttonpane, .t-DialogRegion-buttons, .t-Dialog-footer { border-top: 1px solid var(--cl-line); background: transparent; }
+.ui-dialog .ui-dialog-titlebar-close {
+  border: 0;
+  border-radius: 50%;
+  background: var(--cl-surface-2);
+  box-shadow: var(--cl-raised-sm);
+}
+.ui-dialog .ui-dialog-titlebar-close:active { box-shadow: var(--cl-inset-sm); }
+/* inside a dialog, the region and its buttons container are part of the dialog surface: no second panel or band */
+.t-DialogRegion-buttons, .t-DrawerRegion-buttons, .t-DrawerRegion-wrap, .t-DrawerRegion-body { background: transparent; }
+.ui-dialog .t-DialogRegion, .ui-dialog .t-Drawer,
+.ui-dialog .t-ButtonRegion, .t-DialogRegion .t-ButtonRegion, .t-Dialog-footer .t-ButtonRegion, .t-Drawer .t-ButtonRegion {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.ui-widget-overlay { background: var(--a-overlay-background-color); opacity: 1; }
+.ui-dialog--inlinePopup .ui-dialog-content { border-radius: var(--cl-radius-lg); }
+.ui-dialog--notification { border-radius: var(--cl-radius-lg); }
+.t-Dialog-page, .t-Dialog { background: var(--cl-bg); }
+
+/* tooltips */
+.ui-tooltip, .a-Tooltip {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-text);
+  color: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+
+/* login */
+.t-Login-region { border: 0; border-radius: var(--cl-radius-lg); background: var(--cl-bg); box-shadow: var(--cl-raised-lg); }
+.t-PageBody--login .t-Login-bg { display: none; }
+
+/* =====================================================================================================================
+   5. Buttons
+   ===================================================================================================================== */
+.t-Button:not(.t-Button--noUI):not(.t-Button--link):not(.t-Button--header):not(.t-Button--navBar):not(.t-Button--headerTree) {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  box-shadow: var(--cl-raised-sm);
+  transition: box-shadow var(--cl-speed), color var(--cl-speed), transform var(--cl-speed);
+}
+.t-Button:not(.t-Button--noUI):not(.t-Button--link):not(.t-Button--header):not(.t-Button--navBar):not(.t-Button--headerTree):hover {
+  box-shadow: var(--cl-raised);
+}
+.t-Button:not(.t-Button--noUI):not(.t-Button--link):not(.t-Button--header):not(.t-Button--navBar):not(.t-Button--headerTree):active,
+.t-Button.is-active:not(.t-Button--noUI) {
+  box-shadow: var(--cl-inset-sm);
+  transform: translateY(1px);
+}
+.t-Button:focus-visible { outline: 0; box-shadow: var(--cl-raised-sm), var(--cl-focus) !important; }
+.t-Button[disabled], .t-Button.is-disabled { opacity: .5; box-shadow: none !important; }
+
+/* hot: the accent gradient */
+.t-Button--hot:not(.t-Button--simple):not(.t-Button--noUI):not(.t-Button--link) {
+  background: var(--cl-accent-fill);
+  color: var(--cl-on-accent);
+  box-shadow: var(--cl-accent-shadow) !important;
+}
+.t-Button--hot:not(.t-Button--simple):not(.t-Button--noUI):not(.t-Button--link):hover { filter: brightness(1.06); color: var(--cl-on-accent); }
+.t-Button--hot:not(.t-Button--simple):not(.t-Button--noUI):not(.t-Button--link):active { box-shadow: inset 2px 2px 6px rgba(0, 0, 0, .25) !important; }
+
+/* colored buttons: color as text on the raised surface; with Hot they fill */
+.t-Button--primary:not(.t-Button--hot) { color: var(--cl-accent-text); }
+.t-Button--success:not(.t-Button--hot) { color: var(--cl-success); }
+.t-Button--warning:not(.t-Button--hot) { color: var(--cl-warning); }
+.t-Button--danger:not(.t-Button--hot) { color: var(--cl-danger); }
+.t-Button--hot.t-Button--success:not(.t-Button--simple) { background: var(--cl-success); }
+.t-Button--hot.t-Button--warning:not(.t-Button--simple) { background: var(--cl-warning); }
+.t-Button--hot.t-Button--danger:not(.t-Button--simple) { background: var(--cl-danger); }
+.t-Button--primary:not(.t-Button--simple):not(.t-Button--hot),
+.t-Button--success:not(.t-Button--simple):not(.t-Button--hot),
+.t-Button--warning:not(.t-Button--simple):not(.t-Button--hot),
+.t-Button--danger:not(.t-Button--simple):not(.t-Button--hot) { background: var(--cl-bg); }
+
+/* simple: flat until pressed */
+.t-Button--simple:not(.t-Button--noUI) { background: transparent; box-shadow: none !important; }
+.t-Button--simple:not(.t-Button--noUI):hover { background: var(--cl-hover); }
+.t-Button--simple:not(.t-Button--noUI):active { box-shadow: var(--cl-inset-sm) !important; }
+
+/* button groups (template options First / Inner / Last Button): one raised bar with square inner corners */
+.t-Button--pillStart { border-start-end-radius: 0 !important; border-end-end-radius: 0 !important; }
+.t-Button--pill { border-radius: 0 !important; }
+.t-Button--pillEnd { border-start-start-radius: 0 !important; border-end-start-radius: 0 !important; }
+.t-Button--pillStart, .t-Button--pill, .t-Button--pillEnd { margin-inline: 0 !important; }
+.t-Button--pillStart + .t-Button--pill, .t-Button--pillStart + .t-Button--pillEnd, .t-Button--pill + .t-Button--pill, .t-Button--pill + .t-Button--pillEnd {
+  margin-inline-start: 1px !important;
+}
+/* no UI decoration: only the label */
+.t-Button--noUI { background: transparent !important; box-shadow: none !important; }
+.t-Button--noLabel.t-Button--icon:not(.t-Button--noUI):not(.t-Button--link) { border-radius: var(--cl-radius-sm); }
+.t-Button--small, .t-Button--tiny { border-radius: var(--cl-radius-sm); }
+.t-Button--large { border-radius: var(--cl-radius); }
+.t-Button--link { color: var(--cl-accent-text); }
+.t-Button--noUI:hover { background: var(--cl-hover); }
+
+/* =====================================================================================================================
+   6. Forms
+   ===================================================================================================================== */
+.t-Form-itemWrapper > :is(input.apex-item-text, input.text_field, input.password, input.number_field, input.datepicker, input.popup_lov,
+  input.apex-item-popup-lov, select.apex-item-select, select.selectlist, textarea.apex-item-textarea, textarea.textarea),
+.apex-item-text:not(.t-Form-itemWrapper *),
+.a-Combobox, .apex-item-group--combobox .a-Combobox,
+.apex-item-select-many, .shuttle_left, .shuttle_right, select.shuttle_left, select.shuttle_right,
+.a-ColorPicker-input, .apex-item-color-picker {
+  border-color: transparent;
+  border-radius: var(--cl-radius-sm);
+  background-color: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-inset);
+}
+.t-Form-itemWrapper > :is(input, select, textarea):focus,
+.apex-item-text:focus, .a-Combobox.is-focused, .a-Combobox:focus-within {
+  border-color: transparent;
+  background-color: var(--cl-bg);
+  box-shadow: var(--cl-inset), var(--cl-focus);
+  outline: 0;
+}
+.t-Form-itemWrapper > :is(input, select, textarea)::placeholder { color: var(--cl-text-3); }
+/* every pressed-in field gets the well color (stronger than the surface, most of all in dark mode) */
+.t-Form-itemWrapper > :is(input.apex-item-text, input.text_field, input.password, input.number_field, input.datepicker, input.popup_lov,
+  input.apex-item-popup-lov, select.apex-item-select, select.selectlist, textarea.apex-item-textarea, textarea.textarea),
+.t-Form-itemWrapper > :is(input, select, textarea):focus,
+.apex-item-comboselect, .a-Combobox, .apex-item-select-many, .shuttle_left, .shuttle_right, .apex-item-color-picker, .a-ColorPicker-input,
+.a-IRR-search-field, .a-Toolbar-input, .a-FS-search input, .a-SmartFilter-input,
+.ui-input-search, .ui-filterable input, input[data-type="search"],
+.ck.ck-editor__editable.ck-editor__editable_inline, .ck.ck-editor__main > .ck-editor__editable {
+  background-color: var(--cl-well) !important;
+}
+/* fields the browser filled in (saved user names and passwords): keep the soft well instead of the browser's white-blue */
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, textarea:-webkit-autofill, select:-webkit-autofill {
+  -webkit-text-fill-color: var(--cl-text) !important;
+  caret-color: var(--cl-text);
+  box-shadow: var(--cl-inset), inset 0 0 0 1000px var(--cl-well) !important;
+  transition: background-color 9999s 0s;
+}
+/* number fields: no browser spinner inside the soft well (the arrow keys still change the value) */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.t-Form-itemWrapper > :is(input, select, textarea)[readonly],
+.t-Form-itemWrapper > :is(input, select, textarea)[disabled] { box-shadow: var(--cl-inset-sm); opacity: .75; }
+/* the item icon, pre and post text, and buttons inside the field (date picker, popup LOV, reveal password) */
+.t-Form-itemWrapper > .apex-item-icon { color: var(--cl-text-3); }
+.t-Form-itemText { color: var(--cl-text-2); }
+.t-Form-itemWrapper > .a-Button, .t-Form-itemWrapper > button.a-Button--calendar, .t-Form-itemWrapper > .a-Button--popupLOV {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text-2);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Form-itemWrapper > .a-Button:active { box-shadow: var(--cl-inset-sm); }
+/* buttons attached to a field (date picker, color picker, popup LOV, show password): the end of the field, aligned with
+   it and in its color and edge, not a separate raised button */
+.t-Form-itemWrapper :is(.a-Button--calendar, .a-Button--colorPicker, .a-Button--popupLOV, .t-Button--passwordVisibility) {
+  align-self: stretch;
+  margin-inline-start: 0 !important;
+  border: 1px solid var(--a-field-input-border-color, transparent) !important;
+  border-inline-start-width: 0 !important;
+  border-radius: 0 var(--cl-radius-sm) var(--cl-radius-sm) 0 !important;
+  background: var(--a-field-input-state-background-color, var(--cl-well)) !important;
+  color: var(--cl-text-2) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.t-Form-itemWrapper :is(.a-Button--calendar, .a-Button--colorPicker, .a-Button--popupLOV, .t-Button--passwordVisibility):hover { color: var(--cl-accent-text) !important; }
+/* fields with an attached button: one well around the input and its button */
+.t-Form-itemWrapper:has(> :is(.apex-item-group--popup-lov, .apex-item-group--password, a-date-picker, a-color-picker)) > *,
+.t-Form-itemWrapper > :is(.apex-item-group--popup-lov, .apex-item-group--password),
+.t-Form-itemWrapper > :is(a-date-picker, a-color-picker) { display: flex; }
+.t-Form-itemWrapper > :is(.apex-item-group--popup-lov, .apex-item-group--password, a-date-picker, a-color-picker) {
+  flex: 1 1 auto;
+  border-radius: var(--cl-radius-sm);
+  background: var(--a-field-input-state-background-color, var(--cl-well));
+  box-shadow: var(--cl-inset);
+}
+.t-Form-itemWrapper > :is(.apex-item-group--popup-lov, .apex-item-group--password, a-date-picker, a-color-picker) > input {
+  flex: 1 1 auto;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+.t-Form-itemWrapper > :is(.apex-item-group--popup-lov, .apex-item-group--password, a-date-picker, a-color-picker) :is(.a-Button--calendar, .a-Button--colorPicker, .a-Button--popupLOV, .t-Button--passwordVisibility) {
+  border: 0 !important;
+  border-inline-start: 1px solid var(--cl-line) !important;
+  background: transparent !important;
+}
+.t-Form-itemWrapper > :is(.apex-item-group--popup-lov, .apex-item-group--password, a-date-picker, a-color-picker):focus-within { box-shadow: var(--cl-inset), var(--cl-focus); }
+/* the expand button inside select one / select many: a plain icon inside the field */
+.apex-item-comboselect .a-Button--comboSelect { border: 0 !important; background: transparent !important; color: var(--cl-text-2) !important; box-shadow: none !important; }
+/* labels, help, errors */
+.t-Form-label { color: var(--cl-text); font-weight: 600; }
+.t-Form-helpText, .t-Form-inlineHelp { color: var(--cl-text-2); }
+.t-Form-error, .a-Form-error { color: var(--cl-danger); }
+/* fields in error: the same soft well with a light red tint and a thin soft red edge, not a hard ring */
+.t-Form-itemWrapper > .apex-page-item-error,
+.apex-page-item-error:is(input, select, textarea),
+.apex-item-comboselect:has(.apex-page-item-error) {
+  border-color: transparent !important;
+  background-image: linear-gradient(var(--cl-danger-tint), var(--cl-danger-tint)) !important;
+  box-shadow: var(--cl-inset), 0 0 0 1px color-mix(in srgb, var(--cl-danger) 40%, transparent) !important;
+}
+.t-Form-itemWrapper > .apex-page-item-error:focus,
+.apex-page-item-error:is(input, select, textarea):focus {
+  box-shadow: var(--cl-inset), 0 0 0 1px color-mix(in srgb, var(--cl-danger) 40%, transparent), var(--cl-focus) !important;
+}
+.t-Form-fieldContainer.is-error .t-Form-label, .t-Form-fieldContainer--floatingLabel.is-error .t-Form-label { color: var(--cl-danger); }
+/* required marker of floating labels: a small dot inside the rounded corner, not a square triangle over the edge */
+.t-Form-itemRequired-marker::before {
+  top: 5px !important;      /* clear of the label once it moves up */
+  left: 5px !important;
+  width: 5px !important;
+  height: 5px !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: var(--cl-danger) !important;
+}
+.t-Form-error { margin-top: 6px; font-size: 12.5px; }
+.t-Form-helpButton .a-Icon, .t-Form-helpButton { color: var(--cl-text-3); }
+/* floating labels: the label sits inside the pressed-in field */
+.t-Form-fieldContainer--floatingLabel .t-Form-inputContainer { background: transparent; }
+.t-Form-fieldContainer--floatingLabel .t-Form-label { color: var(--cl-text-2); }
+.t-Form-fieldContainer--floatingLabel.is-active .t-Form-label { color: var(--cl-accent-text); }
+/* checkboxes and radios: small pressed-in wells */
+.apex-item-option input + label::before,
+.u-checkbox::before, .u-radio::before {
+  border: 0 !important;
+  background-color: var(--cl-bg) !important;
+  box-shadow: var(--cl-inset-sm) !important;
+}
+.apex-item-option input:checked + label::before,
+input:checked + .u-checkbox::before, input:checked + .u-radio::before { background-color: var(--cl-accent) !important; box-shadow: var(--cl-raised-sm) !important; }
+.apex-item-option input:focus-visible + label::before,
+input:focus-visible + .u-checkbox::before, input:focus-visible + .u-radio::before { box-shadow: var(--cl-inset-sm), var(--cl-focus) !important; }
+.apex-item-radio input + label::before { border-radius: 50% !important; }
+/* radio group shown as pill buttons: a segmented control - one pressed-in well, flat options, the chosen one raised */
+.t-Form-fieldContainer--radioButtonGroup .apex-item-group--rc .apex-item-grid-row {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: calc(var(--cl-radius-sm) + 4px);
+  background: var(--cl-track);
+  box-shadow: var(--cl-inset-sm);
+}
+.t-Form-fieldContainer--radioButtonGroup .apex-item-group--rc .apex-item-option { flex: 1 1 0; margin: 0; }
+.t-Form-fieldContainer--radioButtonGroup .apex-item-group--rc .apex-item-option label {
+  width: 100%;
+  margin: 0;
+  border: 0 !important;
+  border-radius: var(--cl-radius-sm) !important;
+  background: transparent !important;
+  color: var(--cl-text-2) !important;
+  box-shadow: none !important;
+}
+.t-Form-fieldContainer--radioButtonGroup .apex-item-group--rc .apex-item-option label:hover { color: var(--cl-text) !important; }
+/* Iris gives every "hot" control near-black colors on the element itself: point them at the accent */
+.a-Button--hot, .a-CardView-button--hot, .apex-button-group input:checked + label, .t-Button--hot, .ui-button--hot,
+.t-Form-fieldContainer--radioButtonGroup .apex-item-group--rc input:checked + label {
+  --a-button-background-color: var(--cl-accent);
+  --a-button-text-color: var(--cl-on-accent);
+  --a-button-hover-background-color: var(--cl-accent-hover);
+  --a-button-hover-text-color: var(--cl-on-accent);
+  --a-button-border-color: transparent;
+  --a-button-hover-border-color: transparent;
+}
+.ui-button--hot, .a-CardView-button--hot { background: var(--cl-accent-fill) !important; color: var(--cl-on-accent) !important; box-shadow: var(--cl-accent-shadow) !important; }
+/* the chosen pill of a radio group shown as pill buttons: the accent, like a hot button */
+.t-Form-fieldContainer--radioButtonGroup .apex-item-group--rc .apex-item-option input:checked + label,
+.apex-button-group input:checked + label {
+  background: var(--cl-accent-fill) !important;
+  color: var(--cl-on-accent) !important;
+  box-shadow: var(--cl-accent-shadow) !important;
+  font-weight: 700;
+}
+
+/* radios and checkboxes: Universal Theme outlines the label of the focused input, also after a click; keep an
+   accent ring for the keyboard only */
+.apex-item-option input:focus:not(:focus-visible) + label,
+input:focus:not(:focus-visible) + :is(.u-checkbox, .u-radio),
+input:focus:not(:focus-visible) + :is(.u-checkbox, .u-radio)::before { outline: none !important; }
+.apex-item-option input:focus-visible + label,
+input:focus-visible + :is(.u-checkbox, .u-radio) { outline: 2px solid var(--cl-accent) !important; outline-offset: 2px; }
+/* floating label fields use their own, smaller padding: the same room as other fields */
+.t-Form-fieldContainer--floatingLabel { --a-field-input-padding-x: .75rem; }
+
+/* list boxes (shuttle, select multiple): rounded rows, and the selected row in the accent instead of the browser's grey */
+select[multiple], select[size]:not([size="1"]) { padding: 6px; }
+select[multiple] option, select[size]:not([size="1"]) option { padding: 5px 10px; border-radius: var(--cl-radius-xs); color: var(--cl-text); }
+select[multiple] option:checked, select[size]:not([size="1"]) option:checked {
+  background: linear-gradient(var(--cl-accent-tint), var(--cl-accent-tint)) !important;
+  color: var(--cl-accent-text) !important;
+  font-weight: 600;
+}
+
+/* scrollbars inside list boxes, text areas and scrolling regions: thin and soft */
+select[multiple], select[size]:not([size="1"]), textarea, .t-Region-body, .a-GV-bdy, .a-IRR-tableContainer, .a-TreeView, .ui-dialog-content {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--cl-text-3) 55%, transparent) transparent;
+}
+/* switch: the track sinks in, the knob is raised */
+.a-Switch .a-Switch-toggle { border: 0; background-color: var(--cl-bg); box-shadow: var(--cl-inset-sm); }
+.a-Switch .a-Switch-toggle::before { background-color: var(--cl-surface-2); box-shadow: var(--cl-raised-sm); }
+.a-Switch input:checked + .a-Switch-toggle { background: var(--cl-accent-fill); box-shadow: inset 1px 1px 4px rgba(0, 0, 0, .2); }
+.a-Switch input:checked + .a-Switch-toggle::before { background-color: #f2f2f2; }
+.a-Switch input:focus-visible + .a-Switch-toggle { box-shadow: var(--cl-inset-sm), var(--cl-focus); }
+/* select lists: browsers with customizable selects (Chrome and Edge 135+) draw the open list in the kit's style too;
+   others keep their native list */
+@supports (appearance: base-select) {
+  .t-Form-itemWrapper > select.apex-item-select:not([multiple]):not([size]),
+  .t-Form-itemWrapper > select.apex-item-select[size="1"],
+  .t-Form-itemWrapper > select.selectlist[size="1"] {
+    appearance: base-select;
+  }
+  .t-Form-itemWrapper > select:is(.apex-item-select, .selectlist)::picker-icon { display: none; }   /* UT draws its own arrow */
+  .t-Form-itemWrapper > select:is(.apex-item-select, .selectlist)::picker(select) {
+    appearance: base-select;
+    margin-block: 6px;
+    padding: 6px;
+    border: 0;
+    border-radius: var(--cl-radius-sm);
+    background: var(--cl-surface-2);
+    color: var(--cl-text);
+    box-shadow: var(--cl-float);
+  }
+  .t-Form-itemWrapper > select:is(.apex-item-select, .selectlist) option {
+    padding: 8px 12px;
+    border-radius: var(--cl-radius-xs);
+    color: var(--cl-text);
+  }
+  .t-Form-itemWrapper > select:is(.apex-item-select, .selectlist) option::checkmark { display: none; }
+  .t-Form-itemWrapper > select:is(.apex-item-select, .selectlist) option:is(:hover, :focus-visible) { background: var(--cl-hover); outline: 0; }
+  .t-Form-itemWrapper > select:is(.apex-item-select, .selectlist) option:checked { background: var(--cl-accent-tint); color: var(--cl-accent-text); font-weight: 600; }
+}
+/* the closed select's text is never covered by the arrow */
+.t-Form-itemWrapper > select.apex-item-select { text-overflow: ellipsis; }
+
+/* select one / select many (a-select): the whole field sinks in; chosen values are raised chips */
+.apex-item-comboselect {
+  border-color: transparent !important;
+  border-radius: var(--cl-radius-sm) !important;
+  background-color: var(--cl-well) !important;
+  box-shadow: var(--cl-inset) !important;
+}
+.apex-item-comboselect:focus-within { box-shadow: var(--cl-inset), var(--cl-focus) !important; }
+.apex-item-comboselect .apex-item-text,
+.apex-item-comboselect .apex-item-text:focus { background: transparent !important; box-shadow: none !important; }
+.a-Chip, .apex-item-chip {
+  border: 0;
+  border-radius: var(--cl-radius-pill);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.a-Chip.a-Chip--input { background: transparent; box-shadow: none; }
+
+/* rich text editor (CKEditor 5): its own color variables */
+html:root {
+  --ck-color-base-background: var(--cl-bg);
+  --ck-color-base-foreground: var(--cl-surface-2);
+  --ck-color-base-border: transparent;
+  --ck-color-base-text: var(--cl-text);
+  --ck-color-text: var(--cl-text);
+  --ck-color-toolbar-background: transparent;
+  --ck-color-toolbar-border: transparent;
+  --ck-color-focus-border: var(--cl-accent);
+  --ck-color-button-default-hover-background: var(--cl-hover);
+  --ck-color-button-default-active-background: var(--cl-hover);
+  --ck-color-button-on-background: var(--cl-accent-tint);
+  --ck-color-button-on-hover-background: var(--cl-accent-tint);
+  --ck-color-button-on-color: var(--cl-accent-text);
+  --ck-color-dropdown-panel-background: var(--cl-surface-2);
+  --ck-color-dropdown-panel-border: transparent;
+  --ck-color-panel-background: var(--cl-surface-2);
+  --ck-color-panel-border: transparent;
+  --ck-color-list-background: var(--cl-surface-2);
+  --ck-color-list-button-hover-background: var(--cl-hover);
+  --ck-color-list-button-on-background: var(--cl-accent-tint);
+  --ck-color-list-button-on-text: var(--cl-accent-text);
+  --ck-color-input-background: var(--cl-bg);
+  --ck-color-input-border: transparent;
+  --ck-color-input-text: var(--cl-text);
+  --ck-color-labeled-field-label-background: var(--cl-surface-2);
+  --ck-border-radius: var(--cl-radius-sm);
+  --ck-focus-ring: 1px solid var(--cl-accent);
+}
+.ck.ck-editor__editable.ck-editor__editable_inline,
+.ck.ck-editor__main > .ck-editor__editable {
+  border: 0 !important;
+  border-radius: var(--cl-radius-sm) !important;
+  background: var(--cl-bg) !important;
+  box-shadow: var(--cl-inset) !important;
+}
+.ck.ck-editor__editable.ck-focused { box-shadow: var(--cl-inset), var(--cl-focus) !important; }
+.ck.ck-toolbar { border: 0 !important; background: transparent !important; }
+
+/* legacy markup with a bgcolor attribute (Help Text region, old reports) */
+.t-Region-body [bgcolor] { background: var(--cl-hover) !important; color: var(--cl-text); }
+/* file upload drop zone */
+.a-FileDrop, .apex-item-filedrop { border-radius: var(--cl-radius); background: var(--cl-bg); box-shadow: var(--cl-inset); }
+/* star rating */
+.a-StarRating .fa, .a-StarRating-star { text-shadow: none; }
+/* shuttle buttons */
+.shuttle_controls .a-Button, .apex-item-shuttle .a-Button {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+.shuttle_controls .a-Button:active { box-shadow: var(--cl-inset-sm); }
+/* display only */
+.t-Form-itemWrapper > .display_only { color: var(--cl-text); }
+
+/* APEX widget buttons (popup LOV dialog, IG and IR toolbars, date picker); the Developer Toolbar keeps APEX's look */
+.a-Button:not(.a-Button--noUI):not(.a-Button--link):not(.t-Button):not(.a-Button--devToolbar) {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.a-Button:not(.a-Button--noUI):not(.a-Button--link):not(.t-Button):not(.a-Button--devToolbar):hover { color: var(--cl-accent-text); }
+.a-Button:not(.a-Button--noUI):not(.a-Button--link):not(.t-Button):not(.a-Button--devToolbar):active,
+.a-Button.is-active:not(.a-Button--noUI):not(.a-Button--devToolbar) { box-shadow: var(--cl-inset-sm); }
+.a-Button--hot:not(.t-Button) { background: var(--cl-accent-fill) !important; color: var(--cl-on-accent) !important; box-shadow: var(--cl-accent-shadow) !important; }
+
+/* date picker popup */
+.a-DatePicker, .a-DatePicker--popup, .a-DatePicker-calendar { border: 0; border-radius: var(--cl-radius); }
+.a-DatePicker--popup, .a-DatePicker.is-popup { box-shadow: var(--cl-float); }
+.a-DatePicker-calendar td a, .a-DatePicker-calendar .a-DatePicker-day { border-radius: var(--cl-radius-sm); }
+
+/* =====================================================================================================================
+   7. Lists: links list, media list, badge list, cards, menus, menu bar
+   ===================================================================================================================== */
+/* links list */
+.t-LinksList-item { border: 0; }
+.t-LinksList-link {
+  margin: 4px 0;
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  color: var(--cl-text);
+  transition: box-shadow var(--cl-speed), background-color var(--cl-speed);
+}
+.t-LinksList-link:hover { background: transparent; box-shadow: var(--cl-raised-sm); }
+.t-LinksList-link:active { box-shadow: var(--cl-inset-sm); }
+.t-LinksList-item.is-current > .t-LinksList-link,
+.t-LinksList-item.is-expanded > .t-LinksList-link { color: var(--cl-accent-text); box-shadow: var(--cl-inset-sm); font-weight: 700; }
+.t-LinksList-icon { color: var(--cl-text-2); }
+.t-LinksList-badge { border-radius: var(--cl-radius-pill); background: var(--cl-bg); color: var(--cl-text); box-shadow: var(--cl-inset-sm); }
+
+/* media list */
+.t-MediaList { border: 0; background: transparent; }
+.t-MediaList-item { border: 0; }
+.t-MediaList-itemWrap {
+  border-radius: var(--cl-radius-sm);
+  transition: box-shadow var(--cl-speed);
+}
+a.t-MediaList-itemWrap:hover { background: transparent; box-shadow: var(--cl-raised-sm); }
+a.t-MediaList-itemWrap:active { box-shadow: var(--cl-inset-sm); }
+.t-MediaList-iconWrap .t-MediaList-icon, .t-MediaList-icon {
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-accent-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-MediaList-title { color: var(--cl-text); }
+.t-MediaList-desc { color: var(--cl-text-2); }
+.t-MediaList-badge { border-radius: var(--cl-radius-pill); background: var(--cl-bg); color: var(--cl-text); box-shadow: var(--cl-inset-sm); }
+.t-MediaList--cols .t-MediaList-item { border: 0; }
+/* Span Horizontal: Universal Theme keeps one row that runs out of narrow regions; let the items wrap instead */
+.t-MediaList--horizontal { flex-wrap: wrap !important; }
+.t-MediaList--horizontal .t-MediaList-item { flex: 1 1 190px; min-width: 0; }
+
+/* badge list: plain lists show each value in a raised tile; colored lists (u-colors) keep their colors and get depth */
+.t-BadgeList { border: 0; background: transparent; }
+.t-BadgeList-item { border: 0 !important; background: transparent; }
+.t-BadgeList-wrap { border-radius: var(--cl-radius); }
+.t-BadgeList-value { border-color: transparent !important; }
+.t-BadgeList:not(.u-colors) .t-BadgeList-value {
+  min-width: 3.25em;
+  padding: .35em .6em;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg) !important;
+  color: var(--cl-text) !important;
+  box-shadow: var(--cl-raised-sm) !important;
+  text-align: center;
+}
+.t-BadgeList--circular:not(.u-colors) .t-BadgeList-value { border-radius: 50%; padding: 0; box-shadow: var(--cl-raised) !important; }
+.t-BadgeList:not(.u-colors) .t-BadgeList-label { color: var(--cl-text-2); }
+.t-BadgeList.u-colors .t-BadgeList-wrap { box-shadow: var(--cl-raised-sm); }
+/* on colored tiles the label takes the tile's contrast color, like the value */
+.t-BadgeList.u-colors .t-BadgeList-label { color: inherit !important; opacity: .88; }
+/* colored lists with Circular values: the count sits in a clear circle inside the tile (the tile keeps room for it) */
+.t-BadgeList--circular.u-colors .t-BadgeList-wrap { padding-block: 14px 10px; }
+.t-BadgeList--circular.u-colors .t-BadgeList-value {
+  margin-block-end: 6px;
+  background: rgba(0, 0, 0, .14) !important;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .35), inset 0 2px 5px rgba(0, 0, 0, .18) !important;
+}
+.t-BadgeList:not(.u-colors) a.t-BadgeList-wrap:hover .t-BadgeList-value { box-shadow: var(--cl-inset-sm) !important; }
+
+/* cards (list and report templates) */
+.t-Cards .t-Card-wrap,
+.t-Card .t-Card-wrap {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised);
+  transition: box-shadow var(--cl-speed), transform var(--cl-speed);
+}
+.t-Cards a.t-Card-wrap:hover, .t-Card a.t-Card-wrap:hover { box-shadow: var(--cl-raised-lg); transform: translateY(-2px); }
+.t-Cards a.t-Card-wrap:active, .t-Card a.t-Card-wrap:active { box-shadow: var(--cl-inset); transform: none; }
+.t-Card-icon, .t-Card .t-Icon {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Card-title { color: var(--cl-text); }
+.t-Card-desc, .t-Card-subtitle { color: var(--cl-text-2); }
+.t-Card-info { color: var(--cl-text-3); }
+.t-Cards--featured .t-Card-wrap, .t-Cards--block .t-Card-wrap { box-shadow: var(--cl-raised); }
+.t-Cards--basic .t-Card-wrap { box-shadow: var(--cl-raised-sm); }
+
+/* menus (menu popup, IR/IG actions, navigation bar sub menus) */
+.a-Menu .a-Menu-content, .a-Menu-content {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-surface-2);
+  box-shadow: var(--cl-float);
+}
+.a-Menu .a-Menu-item.is-focused, .a-Menu .a-Menu-item.is-focused > .a-Menu-inner { border-radius: var(--cl-radius-xs); }
+.a-Menu .a-Menu-hSeparator { border-color: var(--cl-line); }
+
+/* menu bar */
+.t-MenuBar .a-MenuBar, .a-MenuBar {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+.a-MenuBar-item { border: 0; border-radius: var(--cl-radius-sm); }
+.a-MenuBar-item.is-focused, .a-MenuBar-item:hover { background: var(--cl-hover); }
+.a-MenuBar-item.is-current, .a-MenuBar-item.is-expanded { box-shadow: var(--cl-inset-sm); background: var(--cl-bg); }
+.a-MenuBar-label, .a-MenuBar-item .a-MenuBar-label { color: var(--cl-text); }
+.a-MenuBar-item.is-current .a-MenuBar-label { color: var(--cl-accent-text); }
+
+/* navigation bar list in the page body: raised like in the header, and it wraps instead of cutting items off */
+.t-Region .t-NavigationBar { flex-wrap: wrap; gap: 10px; }
+.t-NavigationBar .t-Button--navBar {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-NavigationBar .t-Button--navBar:hover { color: var(--cl-accent-text); background: var(--cl-bg); }
+.t-NavigationBar .t-Button--navBar:active, .t-NavigationBar .t-Button--navBar.is-active { box-shadow: var(--cl-inset-sm); }
+
+/* wizard progress list */
+.t-WizardSteps { padding-block: 8px; }
+
+/* list view (jQuery Mobile list) */
+.ui-input-search, .ui-filterable input, .ui-listview-filter input, input[data-type="search"] {
+  border: 0 !important;
+  border-radius: var(--cl-radius-sm) !important;
+  background: var(--cl-bg) !important;
+  color: var(--cl-text) !important;
+  box-shadow: var(--cl-inset) !important;
+}
+.ui-listview-inset { border: 0 !important; border-radius: var(--cl-radius) !important; background: var(--cl-bg); box-shadow: var(--cl-raised-sm) !important; overflow: hidden; }
+.ui-listview > li, .ui-listview .ui-li-static, .ui-listview .ui-li-divider { border-color: var(--cl-line) !important; background: transparent !important; color: var(--cl-text); }
+.ui-listview .ui-li-divider { background: var(--cl-hover) !important; }
+.ui-li-count { border: 0 !important; border-radius: var(--cl-radius-pill) !important; background: var(--cl-bg) !important; color: var(--cl-text-2) !important; box-shadow: var(--cl-inset-sm); }
+
+/* tree region */
+.a-TreeView:not(.t-TreeNav) .a-TreeView-row { border-radius: var(--cl-radius-sm); }
+.a-TreeView:not(.t-TreeNav) .a-TreeView-row.is-selected { background: var(--cl-bg); box-shadow: var(--cl-raised-sm); }
+.a-TreeView:not(.t-TreeNav) .a-TreeView-label { color: var(--cl-text); }
+.a-TreeView-toggle { color: var(--cl-text-3); }
+
+/* =====================================================================================================================
+   8. Reports and template components
+   ===================================================================================================================== */
+/* classic report */
+.t-Report-wrap { border-radius: var(--cl-radius); }
+.t-Report-report { border-collapse: separate; border-spacing: 0; }
+.t-Report-colHead { border-color: var(--cl-line); background: transparent; color: var(--cl-text-2); font-weight: 700; }
+.t-Report-cell { border-color: var(--cl-line); color: var(--cl-text); }
+.t-Report--altRowsDefault .t-Report-report tr:nth-child(odd) .t-Report-cell { background: var(--cl-hover); }
+.t-Report--rowHighlight .t-Report-report tr:hover .t-Report-cell { background: var(--cl-accent-tint) !important; }
+.t-Report-pagination .t-Report-paginationLink, .t-Report-paginationLink {
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Report-paginationLink:active { box-shadow: var(--cl-inset-sm); }
+.t-Report-paginationText b, .t-Report-paginationText strong { padding: 4px 10px; border-radius: var(--cl-radius-sm); background: var(--cl-accent); color: var(--cl-on-accent); box-shadow: var(--cl-accent-shadow); }
+.t-Report--inline .t-Report-report { box-shadow: var(--cl-inset-sm); border-radius: var(--cl-radius-sm); }
+
+/* value attribute pairs and contextual info */
+.t-AVPList-label { color: var(--cl-text-2); }
+.t-AVPList-value { color: var(--cl-text); }
+.t-AVPList--rightAligned .t-AVPList-label, .t-AVPList-item { border-color: var(--cl-line); }
+.t-ContextualInfo { border: 0; }
+.t-ContextualInfo-item {
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-ContextualInfo { padding: 4px; }
+.t-ContextualInfo-label { color: var(--cl-text-2); }
+.t-ContextualInfo-value { color: var(--cl-text); }
+
+/* search results */
+.t-SearchResults-item, .a-ResultsItem {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-SearchResults-title a, .a-ResultsItem-title a { color: var(--cl-accent-text); }
+.t-SearchResults-desc { color: var(--cl-text-2); }
+.t-SearchResults-misc, .t-SearchResults-info { color: var(--cl-text-3); }
+
+/* comments */
+.t-Comments-item { border: 0; }
+.t-Comments-body {
+  box-sizing: border-box;
+  max-width: calc(100% - 8px);
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Comments-body::before, .t-Comments-body::after { display: none; }
+.t-Comments-user { color: var(--cl-text); }
+.t-Comments-date, .t-Comments-info { color: var(--cl-text-3); }
+.t-Comments--chat .t-Comments-item.is-active .t-Comments-body,
+.t-Comments--chat .t-Comments-item--right .t-Comments-body { background: var(--cl-accent-tint); }
+
+/* content row */
+.t-ContentRow-item, .t-ContentRow-wrap { border-color: var(--cl-line); }
+.t-ContentRow-wrap { border-radius: var(--cl-radius-sm); transition: box-shadow var(--cl-speed); }
+.t-ContentRow-item:hover .t-ContentRow-wrap { background: transparent; box-shadow: var(--cl-raised-sm); }
+.t-ContentRow-item.is-selected .t-ContentRow-wrap { box-shadow: var(--cl-inset-sm); }
+.t-ContentRow-title { color: var(--cl-text); }
+.t-ContentRow-description, .t-ContentRow-misc { color: var(--cl-text-2); }
+.t-ContentRow-iconWrap .t-Icon, .t-ContentRow-icon { box-shadow: var(--cl-raised-sm); }
+
+/* timeline */
+.t-Timeline-wrap { border: 0; }
+.t-Timeline-content {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Timeline-content::before, .t-Timeline-content::after { display: none; }
+.t-Timeline-type {
+  border: 0;
+  background: var(--cl-bg);
+  color: var(--cl-accent-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Timeline-type.is-new, .t-Timeline-type--new { color: var(--cl-success); }
+.t-Timeline-type.is-removed, .t-Timeline-type--removed { color: var(--cl-danger); }
+.t-Timeline-type.is-updated, .t-Timeline-type--updated { color: var(--cl-warning); }
+.t-Timeline-item::before, .t-Timeline-wrap::before { background: var(--cl-line); }
+.t-Timeline-title, .t-Timeline-username { color: var(--cl-text); }
+.t-Timeline-desc, .t-Timeline-date { color: var(--cl-text-2); }
+
+/* avatar and badge (template components) */
+.t-Avatar {
+  border: 0;
+  background: var(--cl-bg);
+  color: var(--cl-accent-text);
+  box-shadow: var(--cl-raised-sm);
+}
+.t-Avatar img { border-radius: inherit; }
+.t-Avatar[class*="u-color-"] { box-shadow: var(--cl-raised-sm); }
+.t-Avatar--noShape { background: transparent; box-shadow: none; }
+/* stacked avatars: a fifth overlap (Universal Theme uses half and cuts a crescent out of each, which hides the
+   initials); a ring in the page color keeps them apart instead */
+.t-Avatars--spacingStack { --ut-stack-avatar-offset: 5; }
+.t-Avatars--spacingStack .t-Avatar {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  clip-path: none !important;
+  box-shadow: 0 0 0 3px var(--cl-bg), var(--cl-raised-sm);
+}
+/* without a color of their own, stacked avatars get a soft accent fill so each circle stands out from the one below */
+.t-Avatars--spacingStack .t-Avatar:not([class*="u-color-"]):not(.t-Avatar--image) {
+  background: linear-gradient(var(--cl-accent-tint), var(--cl-accent-tint)), var(--cl-bg);
+}
+.t-Badge {
+  border: 0;
+  border-radius: var(--cl-radius-pill);
+}
+/* neutral badges sink in; colored ones stay flat and crisp (an inner shadow smears the color) */
+.t-Badge--subtle, .t-Badge:not([class*="u-"]):not([class*="t-Badge--"]) { box-shadow: var(--cl-inset-sm); }
+.t-Badge--subtle, .t-Badge:not([class*="u-"]):not([class*="t-Badge--"]) { background: var(--cl-bg); color: var(--cl-text); }
+
+/* metric card */
+.t-MetricCard {
+  border: 0;
+  border-radius: var(--cl-radius);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-raised);
+}
+.t-MetricCard-value, .t-MetricCard-title { color: var(--cl-text); }
+.t-MetricCard-label, .t-MetricCard-subtitle, .t-MetricCard-supplemental { color: var(--cl-text-2); }
+
+/* =====================================================================================================================
+   9. Interactive Report, Interactive Grid, Cards region, Faceted Search, charts, calendar
+   ===================================================================================================================== */
+/* interactive report */
+.a-IRR-container, .t-IRR-region { border: 0; background: transparent; }
+.a-IRR { border: 0; border-radius: var(--cl-radius); background: transparent; box-shadow: none; }
+.a-IRR-toolbar { border: 0; background: transparent; }
+.a-IRR-search-field, .a-IRR-searchFieldContainer input, .a-IRR-search-field.apex-item-text {
+  border: 0;
+  border-radius: var(--cl-radius-pill);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-inset);
+}
+.a-IRR-header, .a-IRR-table th { border-color: var(--cl-line); background: var(--cl-hover); color: var(--cl-text); }
+.a-IRR-table td { border-color: var(--cl-line); color: var(--cl-text); }
+.a-IRR-table tr:hover td { background: var(--cl-hover); }
+/* highlighted rows and cells (saved report highlights set their own light background): dark text stays readable in dark mode */
+/* (APEX writes them as classes rule_<id> with only a background; a text color set in the highlight still wins) */
+:where(.a-IRR-table) :is(tr[class*="rule_"] td, td[class*="rule_"]) { color: #1f2024 !important; }
+:where(.a-IRR-table) :is(tr[class*="rule_"] td, td[class*="rule_"]) a { color: #1f2024; }
+.a-IRR-controls, .a-IRR-controlsContainer { border: 0; background: transparent; }
+.a-IRR-controls-cell { border-radius: var(--cl-radius-sm); }
+.a-IRR-pagination-label { color: var(--cl-text-2); }
+.a-IRR-button, .a-IRR-buttons .a-Button { border-radius: var(--cl-radius-sm); }
+.a-IRR-singleRow-row { border-color: var(--cl-line); }
+
+/* interactive grid */
+.a-IG { border: 0; background: transparent; }
+.a-IG-header { border: 0; background: transparent; }
+.a-IG-body, .a-GV { border: 0; border-radius: var(--cl-radius-sm); }
+.a-GV-hdr { background: var(--cl-hover); }
+.a-GV-header { color: var(--cl-text); }
+.a-GV-cell { color: var(--cl-text); }
+.a-GV-row.is-selected .a-GV-cell { background: var(--cl-accent-tint); }
+.a-GV-cell.is-focused { box-shadow: inset 0 0 0 2px var(--cl-accent); }
+.a-GV-footer { border-color: var(--cl-line); background: var(--cl-bg); color: var(--cl-text-2); }
+.a-Toolbar-input, .a-Toolbar .a-Toolbar-input {
+  border: 0;
+  border-radius: var(--cl-radius-pill);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-inset);
+}
+.a-Toolbar-selectList { border: 0; border-radius: var(--cl-radius-sm); background-color: var(--cl-bg); box-shadow: var(--cl-inset-sm); }
+/* toolbar search (columns button, field, Go): one pressed-in pill with flat contents */
+.a-Toolbar-group--search {
+  padding: 2px 4px;
+  border-radius: var(--cl-radius-pill);
+  background: var(--cl-well);
+  box-shadow: var(--cl-inset-sm);
+}
+.a-Toolbar-group--search .a-Button, .a-Toolbar-group--search .a-Toolbar-input {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.a-Toolbar-group--search .a-Button:hover { color: var(--cl-accent-text); }
+/* grids: no vertical lines and a light header with one soft line below it */
+.a-GV-cell, .a-GV-header, .a-IRR-table td, .a-IRR-table th { border-inline-color: transparent !important; }
+.a-GV-hdr, .a-GV-hdr .a-GV-header, .a-IRR-table th, .a-IRR-header { background: transparent !important; }
+.a-GV-hdr .a-GV-header, .a-IRR-table th { color: var(--cl-text-2); font-weight: 700; }
+.a-GV-hdr .a-GV-header, .a-IRR-table th { border-block-end-color: var(--cl-line) !important; }
+.a-Toolbar-pillButton, .a-Toolbar-group--pill > .a-Button { box-shadow: var(--cl-raised-sm); }
+
+/* cards region (native) */
+.a-CardView { border: 0; }
+.a-CardView-item { border-radius: var(--cl-radius); }
+.a-CardView-iconWrap .a-CardView-icon, .a-CardView-icon { border-radius: var(--cl-radius-sm); box-shadow: var(--cl-raised-sm); }
+.a-CardView-title { color: var(--cl-text); }
+.a-CardView-subTitle, .a-CardView-mainContent, .a-CardView-subContent { color: var(--cl-text-2); }
+.a-CardView-badge { border-radius: var(--cl-radius-pill); box-shadow: var(--cl-inset-sm); }
+
+/* faceted search and smart filters */
+.a-FS-control { border-radius: var(--cl-radius-sm); }
+.a-FS-search .apex-item-text, .a-FS-search input { border-radius: var(--cl-radius-pill); box-shadow: var(--cl-inset); }
+.a-FS-currentFacets .a-Chip, .a-FS-bar .a-Chip { box-shadow: var(--cl-raised-sm); }
+.a-FS-input--search, .a-SmartFilter-input, .a-SmartFilter .a-SmartFilter-search {
+  border: 0;
+  border-radius: var(--cl-radius-pill);
+  background: var(--cl-bg);
+  box-shadow: var(--cl-inset);
+}
+
+/* charts: transparent plot area so the region surface shows */
+.a-JET-chart, .oj-dvt-chart, .oj-chart, .oj-picto-chart, .oj-gauge { background: transparent; }
+
+/* calendar: FullCalendar sets its variables on .fc, so the kit sets them there too */
+.fc {
+  --fc-page-bg-color: var(--cl-bg);
+  --fc-neutral-bg-color: var(--cl-hover);
+  --fc-neutral-text-color: var(--cl-text-2);
+  --fc-border-color: var(--cl-line);
+  --fc-today-bg-color: var(--cl-accent-tint);
+  --fc-list-event-hover-bg-color: var(--cl-hover);
+  --fc-highlight-color: var(--cl-accent-tint);
+  --fc-now-indicator-color: var(--cl-danger);
+}
+.fc .fc-button, .fc .fc-button-primary {
+  border: 0;
+  border-radius: var(--cl-radius-sm);
+  background: var(--cl-bg);
+  color: var(--cl-text);
+  box-shadow: var(--cl-raised-sm);
+  text-shadow: none;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active { background: var(--cl-bg); color: var(--cl-accent-text); box-shadow: var(--cl-inset-sm); }
+.fc .fc-button:focus { box-shadow: var(--cl-raised-sm), var(--cl-focus); }
+.fc .fc-toolbar-title { color: var(--cl-text); }
+.fc .fc-daygrid-event, .fc .fc-timegrid-event { border-radius: var(--cl-radius-xs); }
+.fc .fc-scrollgrid { border-radius: var(--cl-radius-sm); }
+.fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number { color: var(--cl-text); }
+
+/* =====================================================================================================================
+   9b. Clay details: type and shapes
+   ===================================================================================================================== */
+:root { --a-base-font-family: var(--cl-font); }
+.t-Region-title, .t-HeroRegion-title, .ui-dialog .ui-dialog-title { font-weight: 800; letter-spacing: -.005em; }
+/* buttons squish a little when pressed */
+.t-Button:not(.t-Button--noUI):not(.t-Button--link):not(.t-Button--header):not(.t-Button--navBar):not(.t-Button--headerTree):active { transform: translateY(1px) scale(.98); }
+/* hot buttons: candy clay */
+.t-Button--hot:not(.t-Button--simple):not(.t-Button--noUI):not(.t-Button--link):hover { filter: saturate(1.1) brightness(1.04); }
+/* the current navigation entry: a small clay pill */
+.t-TreeNav .a-TreeView-row { border-radius: var(--cl-radius-sm); }
+
+/* =====================================================================================================================
+   10. Helper classes for your own regions and items (CSS Classes property)
+   ===================================================================================================================== */
+.cl-clay { border: 0 !important; background: var(--cl-bg) !important; box-shadow: var(--cl-raised) !important; border-radius: var(--cl-radius) !important; }
+.cl-clay-sm { border: 0 !important; background: var(--cl-bg) !important; box-shadow: var(--cl-raised-sm) !important; }
+.cl-inset { border: 0 !important; background: var(--cl-well) !important; box-shadow: var(--cl-inset) !important; }
+.cl-flat { border: 0 !important; background-image: none !important; box-shadow: none !important; }
+.cl-pill { border-radius: var(--cl-radius-pill) !important; }
+.cl-accent { background: var(--cl-accent-fill) !important; color: var(--cl-on-accent) !important; box-shadow: var(--cl-accent-shadow) !important; }
+
+/* =====================================================================================================================
+   11. Focus and motion
+   ===================================================================================================================== */
+:focus-visible { outline-color: var(--cl-accent); }
+/* no focus ring after a mouse click or tap (Universal Theme draws some on :focus); the keyboard keeps it */
+html :is(button, a, [role="button"], [role="tab"], [tabindex]):focus:not(:focus-visible) { outline: none !important; }
+/* the side navigation and trees focus the clicked entry from script, which counts as keyboard focus:
+   claymorphism.js sets cl-pointer on <html> after mouse or touch input */
+html.cl-pointer :is(.a-TreeView-label, .a-TreeView-content, .t-Region-titleButton):focus { outline: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .t-Button, .t-Card-wrap, .t-LinksList-link, .t-MediaList-itemWrap, .t-Tabs-link, .t-ContentRow-wrap { transition: none !important; transform: none !important; }
+}
